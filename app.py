@@ -18,7 +18,7 @@ food_references = {
     "Lobster": "A whole lobster is around 500 g (edible meat about 150 g).",
     "Crab": "A medium crab has 100–150 g edible meat.",
     "Tuna": "A tuna steak is usually 150–200 g.",
-    "Egg": "A medium egg weighs about 50 g (without shell).",
+    "Egg": "One medium egg is about 50 g without shell, but you can enter the number of eggs directly as units.",
     "Duck breast": "Usually 180–200 g raw.",
     "Cod": "A cod fillet weighs about 120 g.",
     "Scallops": "One scallop weighs about 20 g.",
