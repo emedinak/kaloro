@@ -18,7 +18,7 @@ food_references = {
     "Lobster": "A whole lobster is around 500 g (edible meat about 150 g).",
     "Crab": "A medium crab has 100–150 g edible meat.",
     "Tuna": "A tuna steak is usually 150–200 g.",
-    "Egg": "One medium egg is about 50 g without shell, but you can enter the number of eggs directly as units.",
+    "Egg": "One medium egg is about 50 g without shell, but you can enter the number of eggs directly as units.",
     "Duck breast": "Usually 180–200 g raw.",
     "Cod": "A cod fillet weighs about 120 g.",
     "Scallops": "One scallop weighs about 20 g.",
@@ -80,12 +80,10 @@ food_references = {
     "Pumpkin seeds": "A handful is about 28 g (1 oz)."
 }
 
-food_images = {
-    "Chicken breast": "chicken_breast.png"
-}
-
 with open("combined_foods.json") as f:
     foods = json.load(f)
+
+from utils import crear_comida
 
 TEMPLATE = """
 <!doctype html>
@@ -194,11 +192,6 @@ TEMPLATE = """
                 {% endfor %}
             </select>
             <p id="food-ref" class="food-reference"></p>
-            {% if food_images and request.form.food and food_images.get(request.form.food) %}
-                <img src="{{ url_for('static', filename='images/' + food_images.get(request.form.food)) }}"
-                     alt="{{ request.form.food }}"
-                     style="width: 250px; margin-top: 10px; border-radius: 8px;">
-            {% endif %}
             <label for="quantity">Enter quantity ({{ unit_label }}):</label>
             <input type="number" step="0.01" name="quantity" id="quantity" required>
             <button type="submit" name="action" value="calculate">🟰 Calculate</button>
@@ -224,8 +217,8 @@ TEMPLATE = """
         <div class="result-card fade-in">
             <h2>Meal Total</h2>
             {% if feedback %}
-                <p style="color: red; font-weight: bold;">{{ feedback }}</p>
-            {% endif %}
+  <p style="color: red; font-weight: bold;">{{ feedback }}</p>
+{% endif %}
             <ul>
                 <li>🔥 Calories: {{ meal_total.totales.calories | round(2) }} kcal</li>
                 <li>💪 Protein: {{ meal_total.totales.protein | round(2) }} g</li>
@@ -280,12 +273,7 @@ TEMPLATE = """
     </footer>
 </body>
 </html>
-"""
-
-
-from utils import crear_comida
-
-meal = []
+""" 
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -299,7 +287,7 @@ def index():
 
     if "meal" not in session:
         session["meal"] = []
- 
+
     if request.method == "POST":
         selected_type = request.form.get("type")
         food_list = [f for f in foods if f["type"] == selected_type]
@@ -344,59 +332,24 @@ def index():
 
     return render_template_string(TEMPLATE, types=types, selected_type=selected_type,
                                   food_list=food_list, result=result, quantity=quantity,
-                                  unit_label=unit_label,meal_total=meal_total,
-                                  food_references=food_references, feedback=feedback,
-                                  food_images=food_images)
+                                  unit_label=unit_label, meal_total=meal_total,
+                                  food_references=food_references, feedback=feedback)
 
-
-ABOUT_TEMPLATE = """
-<!doctype html>
-<html>
-<head>
-    <title>About Kaloro</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: "Inter", sans-serif;
-            background: #fdf8f3;
-            color: #333;
-            padding: 20px;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: auto;
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            text-align: left;
-        }
-        a {
-            color: #ff6b00;
-            text-decoration: none;
-            font-weight: 600;
-        }
-    </style>
-</head>
-<body>
-    <div class="container fade-in">
-        <h1>About Kaloro</h1>
-        <p><strong>Kaloro</strong> is a personal web app to help you track and plan your meals, calculating calories, proteins, carbs, and fats in a simple way.</p>
-        <p>This project was created by Eduardo Medina Krumholz, passionate about technology, nutrition and healthy lifestyles.</p>
-        <p>Contact me anytime at <a href="mailto:emedinak7@gmail.com">emedinak7@gmail.com</a> or connect on 
-        <a href="https://www.linkedin.com/in/eduardo-medina-krumholz-3b756b243" target="_blank">LinkedIn</a>.</p>
-        <p style="margin-top:20px;">
-            <a href="/">← Back to Kaloro</a>
-        </p>
-    </div>
-</body>
-</html>
-"""
 
 @app.route("/about")
 def about():
-    return render_template_string(ABOUT_TEMPLATE)
+    return render_template_string("""
+    <!doctype html>
+    <html>
+    <head><title>About Kaloro</title></head>
+    <body>
+    <h1>About Kaloro</h1>
+    <p>Kaloro is a simple web app to help you calculate nutrients and track your meals.</p>
+    <p>Created by Eduardo Medina Krumholz.</p>
+    <p><a href="/">Back to Kaloro</a></p>
+    </body>
+    </html>
+    """)
 
 if __name__ == "__main__":
     import os
