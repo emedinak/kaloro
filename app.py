@@ -80,6 +80,10 @@ food_references = {
     "Pumpkin seeds": "A handful is about 28 g (1 oz)."
 }
 
+food_images = {
+    "Chicken breast": "chicken_breast.png"
+}
+
 with open("combined_foods.json") as f:
     foods = json.load(f)
 
@@ -190,6 +194,11 @@ TEMPLATE = """
                 {% endfor %}
             </select>
             <p id="food-ref" class="food-reference"></p>
+            {% if food_images and request.form.food and food_images.get(request.form.food) %}
+                <img src="{{ url_for('static', filename='images/' + food_images.get(request.form.food)) }}"
+                     alt="{{ request.form.food }}"
+                     style="width: 250px; margin-top: 10px; border-radius: 8px;">
+            {% endif %}
             <label for="quantity">Enter quantity ({{ unit_label }}):</label>
             <input type="number" step="0.01" name="quantity" id="quantity" required>
             <button type="submit" name="action" value="calculate">🟰 Calculate</button>
@@ -215,8 +224,8 @@ TEMPLATE = """
         <div class="result-card fade-in">
             <h2>Meal Total</h2>
             {% if feedback %}
-  <p style="color: red; font-weight: bold;">{{ feedback }}</p>
-{% endif %}
+                <p style="color: red; font-weight: bold;">{{ feedback }}</p>
+            {% endif %}
             <ul>
                 <li>🔥 Calories: {{ meal_total.totales.calories | round(2) }} kcal</li>
                 <li>💪 Protein: {{ meal_total.totales.protein | round(2) }} g</li>
@@ -272,6 +281,7 @@ TEMPLATE = """
 </body>
 </html>
 """
+
 
 from utils import crear_comida
 
@@ -335,7 +345,8 @@ def index():
     return render_template_string(TEMPLATE, types=types, selected_type=selected_type,
                                   food_list=food_list, result=result, quantity=quantity,
                                   unit_label=unit_label,meal_total=meal_total,
-                                  food_references=food_references, feedback=feedback)
+                                  food_references=food_references, feedback=feedback,
+                                  food_images=food_images)
 
 
 ABOUT_TEMPLATE = """
