@@ -214,6 +214,9 @@ TEMPLATE = """
     {% if meal_total %}
         <div class="result-card fade-in">
             <h2>Meal Total</h2>
+            {% if feedback %}
+  <p style="color: red; font-weight: bold;">{{ feedback }}</p>
+{% endif %}
             <ul>
                 <li>🔥 Calories: {{ meal_total.totales.calories | round(2) }} kcal</li>
                 <li>💪 Protein: {{ meal_total.totales.protein | round(2) }} g</li>
@@ -325,10 +328,14 @@ def index():
     if session.get("meal"):
         meal_total = crear_comida(session["meal"])
 
+    feedback = None
+    if meal_total and meal_total["totales"]["calories"] > 850:
+        feedback = "⚠️ Consider reducing portion size."
+
     return render_template_string(TEMPLATE, types=types, selected_type=selected_type,
                                   food_list=food_list, result=result, quantity=quantity,
                                   unit_label=unit_label,meal_total=meal_total,
-                                  food_references=food_references)
+                                  food_references=food_references, feedback=feedback)
 
 
 ABOUT_TEMPLATE = """
